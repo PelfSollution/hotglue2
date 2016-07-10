@@ -402,7 +402,7 @@ $.glue.contextmenu = function()
 					}
 					$(target[j].elem).css('visibility', '');
 					$(target[j].elem).hide();
-					$(target[j].elem).fadeIn(333);
+					$(target[j].elem).fadeIn(1);
 				}
 			}
 			owner = obj;
@@ -460,7 +460,7 @@ $.glue.grid = function()
 					$(elem).addClass('glue-grid');
 					$(elem).addClass('glue-ui');
 					// use complementary color
-					$(elem).css('background-color', $.xcolor.complementary(bg_color));
+					$(elem).css('background-color', '#bbb');
 					$(elem).css('height', grid_height+'px');
 					$(elem).css('left', x+'px');
 					$(elem).css('position', 'absolute');
@@ -477,7 +477,7 @@ $.glue.grid = function()
 					$(elem).addClass('glue-grid');
 					$(elem).addClass('glue-ui');
 					// use complementary color
-					$(elem).css('background-color', $.xcolor.complementary(bg_color));
+					$(elem).css('background-color', '#bbb');
 					$(elem).css('height', '1px');
 					$(elem).css('left', '0px');
 					$(elem).css('position', 'absolute');
@@ -494,7 +494,7 @@ $.glue.grid = function()
 					$(elem).addClass('glue-guide');
 					$(elem).addClass('glue-ui');
 					// use a different color than background and grid lines
-					$(elem).css('background-color', $.xcolor.average($.xcolor.complementary(bg_color), bg_color));
+					$(elem).css('background-color', '#bbb');
 					$(elem).css('height', grid_height+'px');
 					$(elem).css('left', guides_x[i]+'px');
 					$(elem).css('position', 'absolute');
@@ -510,7 +510,7 @@ $.glue.grid = function()
 					$(elem).addClass('glue-guide');
 					$(elem).addClass('glue-ui');
 					// use a different color than background and grid lines
-					$(elem).css('background-color', $.xcolor.average($.xcolor.complementary(bg_color), bg_color));
+					$(elem).css('background-color', '#bbb');
 					$(elem).css('height', '1px');
 					$(elem).css('left', '0px');
 					$(elem).css('position', 'absolute');
@@ -693,6 +693,7 @@ $.glue.menu = function()
 		// menu .. menu name
 		// x, y .. window coordinates to launch the menu
 		show: function(menu, x, y) {
+
 			if (!m[menu]) {
 				return false;
 			}
@@ -770,7 +771,7 @@ $.glue.menu = function()
 					left: (x-(num_rows*max_w)/2+cur_col*max_w)+'px',
 					opacity: 1.0,
 					top: (y-(num_rows*max_h)/2+cur_row*max_h)+'px'
-				}, 200);
+				}, 1);
 				cur_col++;
 			}
 			// register close menu event and set prev_menu
@@ -1576,7 +1577,7 @@ $.glue.upload = function()
 			upload.x = p.x;
 			upload.y = p.y;
 		});
-		$.glue.menu.register('new', elem, 11);
+		// $.glue.menu.register('new', elem, 11);
 		
 		// handle drop events on body
 		// this is based on http://developer.mozilla.org/en/using_files_from_web_applications

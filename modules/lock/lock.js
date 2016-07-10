@@ -79,5 +79,5 @@ $(document).ready(function() {
 		$.glue.object.save(obj);
 	});
 	
-	$.glue.contextmenu.register('object', 'object-lock', elem, 19);
+	 $.glue.contextmenu.register('object', 'object-lock', elem, 19);
 });

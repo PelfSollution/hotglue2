@@ -8,6 +8,7 @@
  *	This source code is licensed under the GNU General Public License.
  *	See the file COPYING for more details.
  */
+error_reporting(E_ERROR|E_WARNING|E_PARSE);
 
 @require_once('config.inc.php');
 require_once('log.inc.php');

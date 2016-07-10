@@ -102,7 +102,9 @@ function controller_edit($args)
 	if (USE_MIN_FILES) {
 		html_add_js(base_url().'js/jquery-ui-1.8.6.custom.min.js', 2);
 	} else {
-		html_add_js(base_url().'js/jquery-ui-1.8.6.custom.js', 2);
+		// html_add_js(base_url().'js/jquery-ui-new.min.js', 2);
+		// html_add_js(base_url().'js/jquery-ui-1.8.6.custom.js', 2);
+		html_add_js('http://code.jquery.com/ui/1.8.24/jquery-ui.js', 2);
 	}
 	if (USE_MIN_FILES) {
 		html_add_js(base_url().'js/farbtastic.min.js', 2);

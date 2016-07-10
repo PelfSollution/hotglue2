@@ -10,3 +10,11 @@
 #glue-menu-page-background-scroll.glue-menu-enabled {
 	background-image: url(page-background-scroll-on.png);
 }
+
+.glue-grid {
+  background-color: rgba(187,187, 187, 0.7) !important;
+}
+
+.ui-state-disabled {
+  opacity: 1 !important;
+}

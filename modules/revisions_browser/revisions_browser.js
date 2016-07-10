@@ -9,6 +9,7 @@
 
 $(document).ready(function() {
 	$('#revisions_browser_revert_btn').bind('click', function(e) {
+        alert('lsls');
 		$.glue.backend({ method: 'glue.revert', page: $.glue.page }, function(data) {
 			var a = $.glue.page.split('.');
 			window.location = $.glue.base_url+'?'+a[0]+'/edit';		

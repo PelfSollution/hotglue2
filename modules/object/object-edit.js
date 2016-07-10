@@ -11,6 +11,55 @@ $(document).ready(function() {
 	//
 	// register menu items
 	//
+	
+	var rebind = function () {
+		$('html').bind('click', function(e) {
+			if (e.target == $('body').get(0)) {
+				if ($('.glue-selected').length) {
+					// deselect when clicking on background
+					$.glue.sel.none();
+					// prevent the menu from firing
+					e.stopImmediatePropagation();
+				}
+			}
+		});
+		// trigger menus on click and doubleclick
+		var menu_dblclick_timeout = false;
+		$('html').bind('click', function(e) {
+			// make sure no iframe has focus as this breaks keyboard shortcuts etc
+			window.focus();
+			// we use 'html' here to give the colorpicker et al a chance to stop the 
+			// propagation of the event in 'body'
+			if (e.target == $('body').get(0)) {
+				if (!$.glue.menu.is_shown()) {
+					if (menu_dblclick_timeout) {
+						clearTimeout(menu_dblclick_timeout);
+						menu_dblclick_timeout = false;
+						// show page menu
+						$.glue.menu.show('page', e.clientX, e.clientY);
+						return false;
+					}
+					menu_dblclick_timeout = setTimeout(function() {
+						menu_dblclick_timeout = false;
+						// prevent the new menu from showing when the user wants to 
+						// simply clear any open menu
+						if ($.glue.menu.prev_menu() == '') {
+							// show new menu
+							$.glue.menu.show('new', e.clientX, e.clientY);
+						}
+					}, 300);
+				}
+			}
+		});
+	}
+
+	var destroyDialog = function  () {
+		$( '#dialog-form').remove();
+		$( '.ui-dialog').remove();
+		rebind();
+	};
+
+	
 	var elem;
 	elem = $('<img src="'+$.glue.base_url+'modules/object/object-clone.png" alt="btn" title="clone object" width="32" height="32">');
 	$(elem).bind('click', function(e) {
@@ -33,7 +82,7 @@ $(document).ready(function() {
 			$.glue.object.save(clone);
 		});
 	});
-	$.glue.contextmenu.register('object', 'object-clone', elem, 1);
+	// $.glue.contextmenu.register('object', 'object-clone', elem, 1);
 	
 	elem = $('<img src="'+$.glue.base_url+'modules/object/object-transparency.png" alt="btn" title="change transparency" width="32" height="32">');
 	$(elem).bind('glue-menu-activate', function(e) {
@@ -65,7 +114,7 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	$.glue.contextmenu.register('object', 'object-transparency', elem, 2);
+	// $.glue.contextmenu.register('object', 'object-transparency', elem, 2);
 	
 	elem = $('<img src="'+$.glue.base_url+'modules/object/object-zindex.png" alt="btn" title="bring object to foreground or background" width="32" height="32">');
 	$(elem).bind('mousedown', function(e) {
@@ -95,13 +144,23 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	$.glue.contextmenu.register('object', 'object-zindex', elem, 3);
+	// $.glue.contextmenu.register('object', 'object-zindex', elem, 3);
 	
-	elem = $('<img src="'+$.glue.base_url+'modules/object/object-link.png" alt="btn" title="make the object a link" width="32" height="32">');
+	elem = $('<img src="'+$.glue.base_url+'modules/object/object-link-new.png" alt="btn" title="make this image a link" width="32" height="32">');
 	$(elem).bind('click', function(e) {
 		var obj = $(this).data('owner');
+		if ($("#dialog-form").length === 0) {
+			$( "html" ).unbind();
+			$('body').append('<div id="dialog-form" class="ui-dialog-content ui-widget-content enter-url" title="Image Link"><form><fieldset><input id="submit" class="control" type="submit" value="Submit" tabindex="-1" style="font-family: Courier;"><input id="cancel" class="control" type="button" value="Cancel" tabindex="-1"><input type="text" name="object-url" id="object-url" class="ui-widget-content ui-corner-all" autofocus><p>enter address (e.g. http://google.de)</p>');
+		  $("#dialog-form").dialog(
+		  	{ closeOnEscape: false, 
+		  		autoOpen: false 
+		  });
+		}
+
 		// get link
 		$.glue.backend({ method: 'glue.load_object', name: $(obj).attr('id') }, function(data) {
+
 			if (data['#error']) {
 				$.glue.error(data['#error']);
 			} else {
@@ -114,32 +173,88 @@ $(document).ready(function() {
 					old_target = data['#data']['object-target'];
 				}
 				old_linkdata = (old_target == '') ? old_link : old_link + ' ' + old_target;
-				var linkdata = prompt('Enter link (e.g. http://hotglue.me or pagename or anchor name).\nTo add target specify its name after a space (e.g. http://hotglue.me _blank)', old_linkdata);
-				if (linkdata === null || linkdata == old_link + ' ' + old_target) {
-					return;
-				}
-				t = linkdata.split(' '); // if there is no space split() returns the string
-				link = t[0];
-				target = t[1];
-				
-				if (link == undefined) {
-					$.glue.backend({ method: 'glue.object_remove_attr', name: $(obj).attr('id'), attr: 'object-link' });
-				} else {
-					// set link
-					$.glue.backend({ method: 'glue.update_object', name: $(obj).attr('id'), 'object-link': link });
-					if (target !== undefined) {
-						// set target
-						$.glue.backend({ method: 'glue.update_object', name: $(obj).attr('id'), 'object-target': target });
+
+				$( "#dialog-form #object-url" ).focus();
+				$( "#dialog-form" ).dialog( "open" );
+				$( "#dialog-form #object-url").val(old_linkdata);
+
+				$( "#dialog-form form input#cancel").on('click', function (){
+					destroyDialog();
+				});
+
+				// listen to dialog submit and save update
+				$( "#dialog-form form").on('submit', function (e){
+					e.preventDefault();
+					link = $('#dialog-form form #object-url').val();
+
+					if (link == undefined) {
+						$.glue.backend({ method: 'glue.object_remove_attr', name: $(obj).attr('id'), attr: 'object-link' }, destroyDialog());
+					} 
+					else {
+						// set link
+						$.glue.backend({ method: 'glue.update_object', name: $(obj).attr('id'), 'object-link': link }, destroyDialog());
 					}
-				}
-				if (old_target !== '' && (target == '' || target == undefined)) {
-					// delete target
-					$.glue.backend({ method: 'glue.object_remove_attr', name: $(obj).attr('id'), attr: 'object-target' });
-				}
+					return false;
+				});
 			}
 		}, false);
 	});
+	
 	$.glue.contextmenu.register('object', 'object-link', elem);
+
+	// Caption menu
+	elem = $('<img src="'+$.glue.base_url+'modules/object/object-caption-new.png" alt="btn" title="add caption to image" width="32" height="32">');
+	$(elem).bind('click', function(e) {
+		var obj = $(this).data('owner');
+
+	  if ($("#dialog-form").length === 0) { 
+			$( "html" ).unbind();
+			$('body').append('<div id="dialog-form" title="Caption"><form class="caption"><fieldset><input id="submit" class="control" type="submit" value="Submit" tabindex="-1"><input id="cancel" class="control button" type="button" value="Cancel" tabindex="-1"><textarea name="caption" id="caption" class="text ui-widget-content"></textarea>');
+		  $("#dialog-form").dialog(
+		  	{ closeOnEscape: false, 
+		  		autoOpen: false 
+		  });
+	 	}
+
+
+		// get caption
+		$.glue.backend (
+			{ 
+				method: 'glue.load_object', 
+				name: $(obj).attr('id') 
+			}, 
+			function(data) {
+
+				var old_caption = '';
+				var caption = '';
+				
+				if (data['#data']['object-caption'] !== undefined) {
+					old_caption = data['#data']['object-caption'].replace(/%br%/g, "\n").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+				}
+
+				$( "#dialog-form" ).dialog( "open" );
+				$( "#dialog-form #caption").val(old_caption);
+
+				$( "#dialog-form form #cancel").on('click', function (){
+					destroyDialog();
+				});
+
+				// listen to dialog submit and save update
+				$( "#dialog-form form").on('submit', function (e){
+					e.preventDefault();
+					caption = $('#dialog-form form #caption').val().replace(/\n/g, "%br%").replace(/\"/g, "&quot;").replace(/\'/g, "&#39;");
+	
+					$.glue.backend(
+						{ method: 'glue.update_object', 
+						  name: $(obj).attr('id'), 
+						  'object-caption': caption 
+						}, destroyDialog()
+					);
+					return false;
+				});
+			}, false);
+	});
+	$.glue.contextmenu.register('object', 'object-caption', elem);
 
 	elem = $('<img src="'+$.glue.base_url+'modules/object/object-target.png" alt="btn" title="get the name of this object (for linking to it)" width="32" height="32">');
 	$(elem).bind('click', function(e) {
@@ -147,16 +262,16 @@ $(document).ready(function() {
 		var name = $(obj).attr('id').split('.').pop();
 		prompt('You can link to this object by copying and pasting this string', $.glue.page+'.'+name);
 	});
-	$.glue.contextmenu.register('object', 'object-target', elem);
+	// $.glue.contextmenu.register('object', 'object-target', elem);
 	
 	elem = $('<img src="'+$.glue.base_url+'modules/object/object-symlink.png" alt="btn" title="make this object appear on all pages" width="32" height="32">');
 	$(elem).bind('click', function(e) {
 		var obj = $(this).data('owner');
 		$.glue.backend({ method: 'glue.object_make_symlink', name: $(obj).attr('id') });
 	});
-	$.glue.contextmenu.register('object', 'object-symlink', elem);
+	// $.glue.contextmenu.register('object', 'object-symlink', elem);
 	
-	elem = $('<img src="'+$.glue.base_url+'modules/object/object-delete.png" alt="btn" title="delete object" width="32" height="32">');
+	elem = $('<img src="'+$.glue.base_url+'modules/object/object-delete-new.png" alt="btn" title="delete object" width="32" height="32">');
 	$(elem).bind('click', function(e) {
 		var obj = $(this).data('owner');
 		var id = $(obj).attr('id');
@@ -168,4 +283,5 @@ $(document).ready(function() {
 		$.glue.canvas.update();
 	});
 	$.glue.contextmenu.register('object', 'object-delete', elem, 20);
+
 });

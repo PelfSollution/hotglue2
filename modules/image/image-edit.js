@@ -190,9 +190,9 @@ $(document).ready(function() {
 		}
 		$.glue.object.save(obj);
 	});
-	$.glue.contextmenu.register('image', 'image-tile', elem);
+	// $.glue.contextmenu.register('image', 'image-tile', elem);
 	
-	elem = $('<img src="'+$.glue.base_url+'modules/image/image-ratio.png" alt="btn" title="reset image size" width="32" height="32">');
+	elem = $('<img src="'+$.glue.base_url+'modules/image/image-ratio-new.png" alt="btn" title="reset image size" width="32" height="32">');
 	$(elem).bind('click', function(e) {
 		var obj = $(this).data('owner');
 		// get original-{width,height} from backend
@@ -220,7 +220,7 @@ $(document).ready(function() {
 			}
 		});
 	});
-	$.glue.contextmenu.register('image', 'image-ratio', elem);
+	$.glue.contextmenu.register('object', 'image-ratio', elem, 12);
 	
 	elem = $('<img src="'+$.glue.base_url+'modules/image/image-pos.png" alt="btn" title="adjust image selection" width="32" height="32">');
 	$(elem).bind('mousedown', function(e) {
@@ -258,7 +258,7 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	$.glue.contextmenu.register('image', 'image-pos', elem);
+	// $.glue.contextmenu.register('image', 'image-pos', elem);
 	
 	elem = $('<img src="'+$.glue.base_url+'img/download.png" alt="btn" title="download original file" width="32" height="32">');
 	$(elem).bind('click', function(e) {
@@ -266,5 +266,5 @@ $(document).ready(function() {
 		// initiate download
 		window.location = $.glue.base_url+'?'+$(obj).attr('id')+'&download=1';
 	});
-	$.glue.contextmenu.register('image', 'image-download', elem);
+	// $.glue.contextmenu.register('image', 'image-download', elem);
 });

@@ -95,6 +95,9 @@ function default_html($add_glue)
 	html_add_css(base_url().'css/main.css', 3);
 	if ($add_glue) {
 		html_add_css(base_url().'css/glue.css', 4);
+		html_add_css(base_url().'js/jquery-ui-new.min.css', 4);
+		html_add_css(base_url().'js/jquery-ui-new.theme.min.css', 4);
+		html_add_css(base_url().'js/jquery-ui-new.structure.min.css', 4);
 	}
 	if ($add_glue) {
 		$jquery = JQUERY;
@@ -112,6 +115,11 @@ function default_html($add_glue)
 		html_add_js_var('$.glue.base_url', base_url());
 		html_add_js_var('$.glue.conf.show_frontend_errors', SHOW_FRONTEND_ERRORS);
 		html_add_js_var('$.glue.version', glue_version());
+	}
+	else {
+	  html_add_js(base_url().'js/jquery-1.8.3.min.js', 8);
+	  html_add_js(base_url().'js/spin.min.js', 9);
+	  html_add_js(base_url().'js/image-caption.js', 10);
 	}
 }
 

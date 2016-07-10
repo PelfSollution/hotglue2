@@ -56,6 +56,7 @@ function _cmp_prio($a, $b)
 function &body()
 {
 	global $html;
+
 	return $html['body'];
 }
 
@@ -123,7 +124,8 @@ function elem_append(&$elem, $c)
 		$elem['val'][] = $c;
 	} elseif (is_string($c) && is_string($elem['val'])) {
 		$elem['val'] .= $c;
-	}
+	}	
+
 }
 
 
@@ -136,6 +138,7 @@ function elem_append(&$elem, $c)
  */
 function elem_attr(&$elem)
 {
+
 	if (func_num_args() == 2) {
 		if (isset($elem[func_get_arg(1)])) {
 			return $elem[func_get_arg(1)];
@@ -187,7 +190,12 @@ function elem_css(&$elem)
 			// clear css property
 			unset($elem['style'][func_get_arg(1)]);
 		} else {
-			$elem['style'][func_get_arg(1)] = func_get_arg(2);
+			if (func_get_arg(1) === 'content'){
+				$elem['style'][func_get_arg(1)] = '"'.func_get_arg(2).'"';
+			}
+			else {
+				$elem['style'][func_get_arg(1)] = func_get_arg(2);
+			}
 		}
 	}
 }
@@ -228,6 +236,7 @@ function elem_finalize($elem)
 			$ret .= ' '.htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8').'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
 		}
 	}
+	
 	$ret .= '>';
 	
 	// make block elements have a newline after the opening tag
@@ -265,6 +274,7 @@ function elem_finalize($elem)
 			}
 		}
 	}
+  
 	// move block element content in by one tab
 	if ($block_tag && 0 < strlen($content)) {
 		// if the content ends with a newline character, remove it
@@ -276,7 +286,6 @@ function elem_finalize($elem)
 	} elseif (0 < strlen($content)) {
 		$ret .= $content;
 	}
-	
 	$ret .= '</'.$elem['tag'].'>';
 	// make block elements have a newline after the closing tag
 	if ($block_tag) {
@@ -507,6 +516,7 @@ function html_add_js_var($key, $val)
 function html_css($prop)
 {
 	global $html;
+
 	if (func_num_args() == 1) {
 		if (@is_array($html['header']['style']) && isset($html['header']['style'][$prop])) {
 			return $html['header']['style'][$prop];
@@ -589,7 +599,21 @@ function html_finalize(&$cache = false)
 	$ret .= '>'.nl();
 	$ret .= '<head>'.nl();
 	$ret .= '<title>'.htmlspecialchars($html['header']['title'], ENT_NOQUOTES, 'UTF-8').'</title>'.nl();
+	
+	$isiPad = (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
+	
+	if ( $isiPad ) 
+	{ 
+    	$ret = '<meta name="viewport" content="width=device-width; initial-scale=0.8; maximum-scale=1.0;">'.nl();
+    }
+    else 
+    {
+    	$ret = '<meta name="viewport" content="width=device-width; initial-scale=0.3; maximum-scale=1.0;">'.nl();
+    }
 	$ret .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'.nl();
+	$ret .= '<meta name="keywords" content="Etienne Descloux, PE–P, Anberg, APC, NMBA, Esther Schipper, 
+		MD72, PIN-UP, Isabella Bortolozzi, Lüttgenmeijer, Croy Nielsen, Tanya Leighton, Swiss Art Awards, 
+		Silberkuppe, Kunsthalle Baden-Baden, Danh Vo, Galerie Mathew, Kunsthaus Bregenz">'.nl();
 	if (@is_array($html['header']['alternate'])) {
 		foreach ($html['header']['alternate'] as $e) {
 			$ret .= '<link rel="alternate" type="'.htmlspecialchars($e['type'], ENT_COMPAT, 'UTF-8').'" href="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'" title="'.htmlspecialchars($e['title'], ENT_COMPAT, 'UTF-8').'">'.nl();
@@ -636,6 +660,7 @@ function html_finalize(&$cache = false)
 			$ret .= '<script type="text/javascript" src="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'"></script>'.nl();
 		}
 	}
+
 	if (@is_array($html['header']['js_var'])) {
 		$ret .= array_to_js($html['header']['js_var']);
 	}
@@ -689,7 +714,9 @@ function html_finalize(&$cache = false)
 		}
 		body_append($user_body);
 	}
+
 	$ret .= elem_finalize($html['body']);
+	
 	$ret .= '</html>';
 	
 	// pass caching information up if requested

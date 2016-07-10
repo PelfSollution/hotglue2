@@ -281,7 +281,7 @@ $(document).ready(function() {
 		});
 		$.glue.menu.hide();
 	});
-	$.glue.menu.register('new', elem);
+	// $.glue.menu.register('new', elem);
 	
 	//
 	// context menu items

@@ -28,15 +28,11 @@ function webvideo_alter_render_early($args)
 	
 	$i = elem('iframe');
 	if ($obj['webvideo-provider'] == 'youtube') {
-  /*
 		if (empty($_SERVER['HTTPS'])) {
 			$src = 'http://';
 		} else {
 			$src = 'https://';
 		}
-  */
-    // use protocol relative url
-		$src = '//';
 		$src .= 'www.youtube.com/embed/'.$obj['webvideo-id'].'?rel=0';
 		if (isset($obj['webvideo-autoplay']) && $obj['webvideo-autoplay'] == 'autoplay') {
 			$src .= '&autoplay=1';
@@ -48,16 +44,7 @@ function webvideo_alter_render_early($args)
 		elem_attr($i, 'src', $src);
 		elem_add_class($i, 'youtube-player');		
 	} elseif ($obj['webvideo-provider'] == 'vimeo') {
-  /*
-    if (empty($_SERVER['HTTPS'])) {
-      $src = 'http://';
-    } else {
-      $src = 'https://';
-    }
-  */
-    // use protocol relative url
- 		$src = '//';
-    $src .= 'player.vimeo.com/video/'.$obj['webvideo-id'].'?title=0&byline=0&portrait=0&color=ffffff';
+		$src = 'http://player.vimeo.com/video/'.$obj['webvideo-id'].'?title=0&byline=0&portrait=0&color=ffffff';
 		if (isset($obj['webvideo-autoplay']) && $obj['webvideo-autoplay'] == 'autoplay') {
 			$src .= '&autoplay=1';
 		}

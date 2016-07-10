@@ -63,7 +63,7 @@ $(document).ready(function() {
 		}
 		$.glue.object.save(obj);
 		});
-	$.glue.contextmenu.register('object', 'object-transform-flip', elem, 5);
+	// $.glue.contextmenu.register('object', 'object-transform-flip', elem, 5);
 
 /* implement this later */
 /*	elem = $('<img src="'+$.glue.base_url+'modules/transform/transform-rotate.png" alt="btn" title="rotate object" width="32" height="32">');
